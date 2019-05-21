@@ -1,4 +1,4 @@
-FROM tomaka/rust-android
+FROM appaquet/rust-android
 
 COPY . /root/cargo-apk
 RUN cargo install --path /root/cargo-apk/cargo-apk
