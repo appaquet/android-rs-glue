@@ -1,14 +1,14 @@
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
 RUN apt-get update
-RUN apt-get install -yq sudo curl file build-essential wget git g++ cmake pkg-config bison flex \
-                        unzip openjdk-8-jdk lib32stdc++6 lib32z1 docker libssl-dev
+RUN apt-get install -yq sudo curl file build-essential wget git cmake pkg-config \
+                        unzip openjdk-8-jdk libssl-dev clang
 
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 ENV PATH /root/.cargo/bin:$PATH
 
-#RUN rustup default nightly
 RUN rustup target add arm-linux-androideabi
+RUN rustup target add aarch64-linux-android
 RUN rustup target add i686-linux-android
 
 ENV ANDROID_HOME /opt/android-sdk-linux
@@ -20,15 +20,16 @@ RUN mkdir ${ANDROID_HOME} && \
     chown -R root:root /opt
 RUN yes | ${ANDROID_HOME}/tools/bin/sdkmanager "platform-tools"
 RUN yes | ${ANDROID_HOME}/tools/bin/sdkmanager "platforms;android-18"
+RUN yes | ${ANDROID_HOME}/tools/bin/sdkmanager "platforms;android-21"
 RUN yes | ${ANDROID_HOME}/tools/bin/sdkmanager "build-tools;26.0.1"
 RUN ${ANDROID_HOME}/tools/bin/sdkmanager --update
 ENV PATH $PATH:${ANDROID_HOME}/tools:$ANDROID_HOME/platform-tools
 
 RUN cd /usr/local && \
-    wget -q http://dl.google.com/android/repository/android-ndk-r15b-linux-x86_64.zip && \
-    unzip -q android-ndk-r15b-linux-x86_64.zip && \
-    rm android-ndk-r15b-linux-x86_64.zip
-ENV NDK_HOME /usr/local/android-ndk-r15b
+    wget -q http://dl.google.com/android/repository/android-ndk-r17b-linux-x86_64.zip && \
+    unzip -q android-ndk-r17b-linux-x86_64.zip && \
+    rm android-ndk-r17b-linux-x86_64.zip
+ENV NDK_HOME /usr/local/android-ndk-r17b
 
 ENV GRADLE_VERSION 4.0.1
 RUN cd /usr/lib && \
